@@ -19,7 +19,6 @@ from pip.commands import _commands
 
 import pip.commands as commands_
 
-# assignment for flake8 to be happy
 commands = commands_
 
 # This fixes a peculiarity when importing via __import__ - as we are

@@ -15,6 +15,9 @@ from pip.commands.unzip import UnzipCommand
 from pip.commands.zip import ZipCommand
 from pip.commands.wheel import WheelCommand
 
+import sys
+
+thismodule = sys.modules[__name__]
 
 _commands = {
     CompletionCommand.name: CompletionCommand,
@@ -45,33 +48,47 @@ commands_order = [
 ]
 
 
-def get_summaries(ignore_hidden=True, ordered=True):
-    """Yields sorted (command name, command summary) tuples."""
+class commands:
+    """
+    Define a local class to be instanciated and swap for the module defnition
+    in sys  path at the end, it is the recommended way to fake a getattr on a
+    module.
+    """
 
-    if ordered:
-        cmditems = _sort_commands(_commands, commands_order)
-    else:
-        cmditems = _commands.items()
+    @classmethod
+    def get_summaries(ignore_hidden=True, ordered=True):
+        """Yields sorted (command name, command summary) tuples."""
 
-    for name, command_class in cmditems:
-        if ignore_hidden and command_class.hidden:
-            continue
+        if ordered:
+            cmditems = _sort_commands(_commands, commands_order)
+        else:
+            cmditems = _commands.items()
 
-        yield (name, command_class.summary)
+        for name, command_class in cmditems:
+            if ignore_hidden and command_class.hidden:
+                continue
 
+            yield (name, command_class.summary)
 
-def get_similar_commands(name):
-    """Command name auto-correct."""
-    from difflib import get_close_matches
+    @classmethod
+    def get_similar_commands(name):
+        """Command name auto-correct."""
+        from difflib import get_close_matches
 
-    name = name.lower()
+        name = name.lower()
 
-    close_commands = get_close_matches(name, _commands.keys())
+        close_commands = get_close_matches(name, _commands.keys())
 
-    if close_commands:
-        return close_commands[0]
-    else:
-        return False
+        if close_commands:
+            return close_commands[0]
+        else:
+            return False
+
+    def __getattr__(self, key):
+        return getattr(thismodule, key)
+
+    def __getitem__(self, key):
+        return _commands[key]
 
 
 def _sort_commands(cmddict, order):
@@ -84,4 +101,5 @@ def _sort_commands(cmddict, order):
 
     return sorted(cmddict.items(), key=keyfn)
 
-__all__ = _commands
+
+sys.modules[__name__] = commands()
