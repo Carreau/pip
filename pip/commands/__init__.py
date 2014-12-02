@@ -115,5 +115,6 @@ def _sort_commands(cmddict, order):
 
     return sorted(cmddict.items(), key=keyfn)
 
+commands = commands()
+sys.modules[__name__] = commands
 
-sys.modules[__name__] = commands()
