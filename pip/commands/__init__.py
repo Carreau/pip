@@ -48,7 +48,11 @@ commands_order = [
 ]
 
 
-class commands:
+
+import collections
+import collections.abc
+
+class commands(collections.abc.Iterable):
     """
     Define a local class to be instanciated and swap for the module defnition
     in sys  path at the end, it is the recommended way to fake a getattr on a
@@ -89,6 +93,16 @@ class commands:
 
     def __getitem__(self, key):
         return _commands[key]
+
+    def __iter__(self):
+        self.it = iter(_commands)
+        return self.it
+
+    def __len__(self):
+        return len(_commands)
+
+    def __next__(self):
+        return next(self.it)
 
 
 def _sort_commands(cmddict, order):
