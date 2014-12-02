@@ -16,7 +16,7 @@ from pip.commands.zip import ZipCommand
 from pip.commands.wheel import WheelCommand
 
 
-commands = {
+_commands = {
     CompletionCommand.name: CompletionCommand,
     FreezeCommand.name: FreezeCommand,
     HelpCommand.name: HelpCommand,
@@ -49,9 +49,9 @@ def get_summaries(ignore_hidden=True, ordered=True):
     """Yields sorted (command name, command summary) tuples."""
 
     if ordered:
-        cmditems = _sort_commands(commands, commands_order)
+        cmditems = _sort_commands(_commands, commands_order)
     else:
-        cmditems = commands.items()
+        cmditems = _commands.items()
 
     for name, command_class in cmditems:
         if ignore_hidden and command_class.hidden:
@@ -66,7 +66,7 @@ def get_similar_commands(name):
 
     name = name.lower()
 
-    close_commands = get_close_matches(name, commands.keys())
+    close_commands = get_close_matches(name, _commands.keys())
 
     if close_commands:
         return close_commands[0]
@@ -83,3 +83,5 @@ def _sort_commands(cmddict, order):
             return 0xff
 
     return sorted(cmddict.items(), key=keyfn)
+
+__all__ = _commands
