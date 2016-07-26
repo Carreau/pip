@@ -471,6 +471,7 @@ class RequirementSet(object):
                     path = url_to_path(req_to_install.link.url)
                     logger.info('Processing %s', display_path(path))
                 else:
+                    import pdb; pdb.set_trace()
                     logger.info('Collecting %s', req_to_install)
 
         with indent_log():
